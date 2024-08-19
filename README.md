@@ -24,3 +24,4 @@ The entry point for the `grep` implementation is in `app/main.py`.
 
 - Matching literal character (in this case `a` in `apple`) `echo -n "apple" | ./rift.sh -E "a"`
 - Matching digits `echo -n "apple123" | ./rift.sh -E "\d"`
+- Matching alphanumeric characters `echo -n "alpha-num3ric" | ./rift.sh -E "\w"`
