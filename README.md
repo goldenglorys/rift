@@ -27,3 +27,7 @@ The entry point for the `grep` implementation is in `app/main.py`.
 - Matching alphanumeric characters `echo -n "alpha-num3ric" | ./rift.sh -E "\w"`
 - Matching positive character groups `echo -n "apple" | ./rift.sh -E "[abc]"`
 - Matching negative character groups `echo -n "apple" | ./rift.sh -E "[^abc]"`
+
+# Good Read
+
+[A Regular Expression Matcher](https://www.cs.princeton.edu/courses/archive/spr09/cos333/beautiful.html) - by Rob Pike
