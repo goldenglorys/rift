@@ -6,14 +6,14 @@ ANCHOR = "\\^"
 
 
 def match_pattern(input_line, pattern):
+    if pattern[0] == ANCHOR:
+        return match_pattern(input_line, pattern[1:])
     if len(input_line) == 0 and len(pattern) == 0:
         return True
     if not pattern:
         return True
     if not input_line:
         return False
-    if pattern[0] == ANCHOR:
-        return match_pattern(input_line, pattern[1:])
     if pattern[0] == input_line[0]:
         return match_pattern(input_line[1:], pattern[1:])
     elif pattern[:2] == DIGIT:
@@ -28,7 +28,7 @@ def match_pattern(input_line, pattern):
         else:
             return False
     elif pattern[0] == "[" and pattern[-1] == "]":
-        if pattern[1] == "^":
+        if pattern[1] == ANCHOR:
             chrs = list(pattern[2:-1])
             for c in chrs:
                 if c in input_line:
