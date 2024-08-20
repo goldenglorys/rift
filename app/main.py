@@ -23,7 +23,11 @@ def match_pattern(input_line, pattern):
     # Check for start of string anchor '^'
     if pattern[0] == ANCHOR_START:
         # Ensure the input line starts with the rest of the pattern
-        return match_pattern(input_line, pattern[1:])
+        return (
+            match_pattern(input_line, pattern[1:])
+            if input_line.startswith(pattern[1:])
+            else False
+        )
 
     # Check for end of string anchor '$'
     if pattern[-1] == ANCHOR_END:
