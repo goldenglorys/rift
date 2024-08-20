@@ -2,7 +2,8 @@ import sys
 
 DIGIT = "\\d"  # Constant for digit pattern
 ALNUM = "\\w"  # Constant for alphanumeric pattern
-ANCHOR = "^"  # Constant for start of string anchor
+ANCHOR_START = "^"  # Constant for start of string anchor
+ANCHOR_END = "$"  # Constant for end of string anchor
 
 
 def match_pattern(input_line, pattern):
@@ -17,13 +18,18 @@ def match_pattern(input_line, pattern):
         return False
 
     # Check for start of string anchor '^'
-    if pattern[0] == ANCHOR:
+    if pattern[0] == ANCHOR_START:
         # Handle the case where '^' is followed by another '^'
-        if len(pattern) > 1 and pattern[1] == ANCHOR:
+        if len(pattern) > 1 and pattern[1] == ANCHOR_START:
             return match_pattern(input_line, pattern[1:])
         else:
             # Ensure the input line starts with the rest of the pattern
             return input_line.startswith(pattern[1:])
+
+    # Check for end of string anchor '$'
+    if pattern[-1] == ANCHOR_END:
+        # Ensure the input line ends with the pattern before the '$'
+        return input_line.endswith(pattern[:-1])
 
     # If the current characters match, continue matching the rest
     if pattern[0] == input_line[0]:
@@ -46,7 +52,7 @@ def match_pattern(input_line, pattern):
 
     # Handle character class pattern '[...]'
     elif pattern[0] == "[" and pattern[-1] == "]":
-        if pattern[1] == ANCHOR:
+        if pattern[1] == ANCHOR_START:
             chrs = list(pattern[2:-1])
             for c in chrs:
                 if c in input_line:

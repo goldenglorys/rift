@@ -17,7 +17,7 @@ expressions are evaluated.
 The entry point for the `grep` implementation is in `app/main.py`.
 
 1. Ensure you have `python (3.11)` installed locally
-1. Run `./your_program.sh` to run your program, which is implemented in
+1. Run `./rift.sh` to run your program, which is implemented in
    `app/main.py`.
 
 # Execution
@@ -28,7 +28,7 @@ The entry point for the `grep` implementation is in `app/main.py`.
 - Matching positive character groups `echo -n "apple" | ./rift.sh -E "[abc]"`
 - Matching negative character groups `echo -n "apple" | ./rift.sh -E "[^abc]"`
 - Matching combining character classes `cho -n "1 apple" | ./rift.sh -E "\d apple"` | `echo "sally has 3 apples" | ./rift.sh -E "\d apple"`
-- Matching Start of string anchor `echo -n "log" | ./rift.sh -E "^log"`
+- Matching start of string anchor `echo -n "log" | ./rift.sh -E "^log"`
 
 # Good Read
 
