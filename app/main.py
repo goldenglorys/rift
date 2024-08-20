@@ -6,6 +6,7 @@ ANCHOR_START = "^"  # Constant for start of string anchor
 ANCHOR_END = "$"  # Constant for end of string anchor
 QUANTIFIER_ONE_OR_MORE = "+"  # Constant for one or more quantifier
 QUANTIFIER_ZERO_OR_ONE = "?"  # Constant for zero or one quantifier
+WILDCARD = "."  # Constant for wildcard matching any character
 
 
 def match_pattern(input_line, pattern):
@@ -21,23 +22,24 @@ def match_pattern(input_line, pattern):
 
     # Check for start of string anchor '^'
     if pattern[0] == ANCHOR_START:
-        # Handle the case where '^' is followed by another '^'
-        if len(pattern) > 1 and pattern[1] == ANCHOR_START:
-            return match_pattern(input_line, pattern[1:])
-        else:
-            # Ensure the input line starts with the rest of the pattern
-            return input_line.startswith(pattern[1:])
+        # Ensure the input line starts with the rest of the pattern
+        return match_pattern(input_line, pattern[1:])
 
     # Check for end of string anchor '$'
     if pattern[-1] == ANCHOR_END:
         # Ensure the input line ends with the pattern before the '$'
-        return input_line.endswith(pattern[:-1])
+        return (
+            match_pattern(input_line, pattern[:-1])
+            and len(input_line) == len(pattern) - 1
+        )
 
     # Check for one or more quantifier '+'
     if len(pattern) > 1 and pattern[1] == QUANTIFIER_ONE_OR_MORE:
         # Match one or more occurrences of the preceding element
         i = 0
-        while i < len(input_line) and input_line[i] == pattern[0]:
+        while i < len(input_line) and (
+            input_line[i] == pattern[0] or pattern[0] == WILDCARD
+        ):
             i += 1
         if i > 0:
             return match_pattern(input_line[i:], pattern[2:])
@@ -47,10 +49,18 @@ def match_pattern(input_line, pattern):
     # Check for zero or one quantifier '?'
     if len(pattern) > 1 and pattern[1] == QUANTIFIER_ZERO_OR_ONE:
         # Match zero or one occurrence of the preceding element
-        if input_line and input_line[0] == pattern[0]:
+        if input_line and (input_line[0] == pattern[0] or pattern[0] == WILDCARD):
             return match_pattern(input_line[1:], pattern[2:])
         else:
             return match_pattern(input_line, pattern[2:])
+
+    # Check for wildcard '.'
+    if pattern[0] == WILDCARD:
+        # Match any single character
+        if input_line:
+            return match_pattern(input_line[1:], pattern[1:])
+        else:
+            return False
 
     # If the current characters match, continue matching the rest
     if pattern[0] == input_line[0]:
