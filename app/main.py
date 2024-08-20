@@ -4,6 +4,7 @@ DIGIT = "\\d"  # Constant for digit pattern
 ALNUM = "\\w"  # Constant for alphanumeric pattern
 ANCHOR_START = "^"  # Constant for start of string anchor
 ANCHOR_END = "$"  # Constant for end of string anchor
+QUANTIFIER_ONE_OR_MORE = "+"  # Constant for one or more quantifier
 
 
 def match_pattern(input_line, pattern):
@@ -30,6 +31,17 @@ def match_pattern(input_line, pattern):
     if pattern[-1] == ANCHOR_END:
         # Ensure the input line ends with the pattern before the '$'
         return input_line.endswith(pattern[:-1])
+
+    # Check for one or more quantifier '+'
+    if len(pattern) > 1 and pattern[1] == QUANTIFIER_ONE_OR_MORE:
+        # Match one or more occurrences of the preceding element
+        i = 0
+        while i < len(input_line) and input_line[i] == pattern[0]:
+            i += 1
+        if i > 0:
+            return match_pattern(input_line[i:], pattern[2:])
+        else:
+            return False
 
     # If the current characters match, continue matching the rest
     if pattern[0] == input_line[0]:
