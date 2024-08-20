@@ -31,6 +31,7 @@ The entry point for the `grep` implementation is in `app/main.py`.
 - Matching start of string anchor/line anchor `echo -n "log" | ./rift.sh -E "^log"`
 - Matching end of string/line anchor ` echo -n "dog" | ./rift.sh -E "dog$"`
 - Match one or more quantifier `echo -n "caats" | ./rift.sh -E "ca+ts"`
+- Match zero or one quantifier `echo -n "dogs" | ./rift.sh -E "dogs?"`
 
 # Good Read
 
