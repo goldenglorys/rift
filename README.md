@@ -28,6 +28,7 @@ The entry point for the `grep` implementation is in `app/main.py`.
 - Matching positive character groups `echo -n "apple" | ./rift.sh -E "[abc]"`
 - Matching negative character groups `echo -n "apple" | ./rift.sh -E "[^abc]"`
 - Matching combining character classes `cho -n "1 apple" | ./rift.sh -E "\d apple"` | `echo "sally has 3 apples" | ./rift.sh -E "\d apple"`
+- Matching Start of string anchor `echo -n "log" | ./rift.sh -E "^log"`
 
 # Good Read
 
