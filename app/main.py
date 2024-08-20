@@ -5,6 +5,7 @@ ALNUM = "\\w"  # Constant for alphanumeric pattern
 ANCHOR_START = "^"  # Constant for start of string anchor
 ANCHOR_END = "$"  # Constant for end of string anchor
 QUANTIFIER_ONE_OR_MORE = "+"  # Constant for one or more quantifier
+QUANTIFIER_ZERO_OR_ONE = "?"  # Constant for zero or one quantifier
 
 
 def match_pattern(input_line, pattern):
@@ -42,6 +43,14 @@ def match_pattern(input_line, pattern):
             return match_pattern(input_line[i:], pattern[2:])
         else:
             return False
+
+    # Check for zero or one quantifier '?'
+    if len(pattern) > 1 and pattern[1] == QUANTIFIER_ZERO_OR_ONE:
+        # Match zero or one occurrence of the preceding element
+        if input_line and input_line[0] == pattern[0]:
+            return match_pattern(input_line[1:], pattern[2:])
+        else:
+            return match_pattern(input_line, pattern[2:])
 
     # If the current characters match, continue matching the rest
     if pattern[0] == input_line[0]:
