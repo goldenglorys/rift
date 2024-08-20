@@ -8,6 +8,8 @@ QUANTIFIER_ONE_OR_MORE = "+"  # Constant for one or more quantifier
 QUANTIFIER_ZERO_OR_ONE = "?"  # Constant for zero or one quantifier
 WILDCARD = "."  # Constant for wildcard matching any character
 ALTERNATION = "|"  # Constant for alternation keyword
+GROUP_START = "("  # Constant for group start
+GROUP_END = ")"  # Constant for group end
 
 
 def match_pattern(input_line, pattern):
@@ -37,6 +39,18 @@ def match_pattern(input_line, pattern):
             match_pattern(input_line, pattern[:-1])
             and len(input_line) == len(pattern) - 1
         )
+
+    # Check for group start '('
+    if pattern[0] == GROUP_START:
+        # Find the matching group end ')'
+        group_end_index = find_matching_group_end(pattern)
+        if group_end_index == -1:
+            return False
+        # Try matching the pattern inside the group
+        if match_pattern(input_line, pattern[1:group_end_index]):
+            return match_pattern(input_line, pattern[group_end_index + 1 :])
+        else:
+            return False
 
     # Check for alternation '|'
     if ALTERNATION in pattern:
@@ -113,6 +127,18 @@ def match_pattern(input_line, pattern):
     # If none of the above conditions match, skip a character in input
     else:
         return match_pattern(input_line[1:], pattern)
+
+
+def find_matching_group_end(pattern):
+    level = 1
+    for i in range(1, len(pattern)):
+        if pattern[i] == GROUP_START:
+            level += 1
+        elif pattern[i] == GROUP_END:
+            level -= 1
+            if level == 0:
+                return i
+    return -1
 
 
 def main():
