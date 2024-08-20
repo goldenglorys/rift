@@ -2,6 +2,7 @@ import sys
 
 DIGIT = "\\d"
 ALNUM = "\\w"
+ANCHOR = "\\^"
 
 
 def match_pattern(input_line, pattern):
@@ -11,7 +12,7 @@ def match_pattern(input_line, pattern):
         return True
     if not input_line:
         return False
-    if pattern[0] == "^":
+    if pattern[0] == ANCHOR:
         return match_pattern(input_line, pattern[1:])
     if pattern[0] == input_line[0]:
         return match_pattern(input_line[1:], pattern[1:])
