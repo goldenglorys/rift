@@ -7,6 +7,7 @@ ANCHOR_END = "$"  # Constant for end of string anchor
 QUANTIFIER_ONE_OR_MORE = "+"  # Constant for one or more quantifier
 QUANTIFIER_ZERO_OR_ONE = "?"  # Constant for zero or one quantifier
 WILDCARD = "."  # Constant for wildcard matching any character
+ALTERNATION = "|"  # Constant for alternation keyword
 
 
 def match_pattern(input_line, pattern):
@@ -36,6 +37,16 @@ def match_pattern(input_line, pattern):
             match_pattern(input_line, pattern[:-1])
             and len(input_line) == len(pattern) - 1
         )
+
+    # Check for alternation '|'
+    if ALTERNATION in pattern:
+        # Find the first occurrence of '|' to split the pattern
+        pipe_index = pattern.find(ALTERNATION)
+        # Try matching the pattern before the '|'
+        if match_pattern(input_line, pattern[:pipe_index]):
+            return True
+        # Try matching the pattern after the '|'
+        return match_pattern(input_line, pattern[pipe_index + 1 :])
 
     # Check for one or more quantifier '+'
     if len(pattern) > 1 and pattern[1] == QUANTIFIER_ONE_OR_MORE:
