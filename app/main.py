@@ -7,138 +7,178 @@ ANCHOR_END = "$"  # Constant for end of string anchor
 QUANTIFIER_ONE_OR_MORE = "+"  # Constant for one or more quantifier
 QUANTIFIER_ZERO_OR_ONE = "?"  # Constant for zero or one quantifier
 WILDCARD = "."  # Constant for wildcard matching any character
-ALTERNATION = "|"  # Constant for alternation keyword
-GROUP_START = "("  # Constant for group start
-GROUP_END = ")"  # Constant for group end
+OR_OPERATOR = "|"  # Constant for OR operator
 
 
 def match_pattern(input_line, pattern):
+    """
+    Matches an input string against a pattern with various regex-like features.
+
+    :param input_line: The input string to be matched.
+    :param pattern: The pattern string to match against.
+    :return: True if the input string matches the pattern, False otherwise.
+    """
+    print(
+        f"Matching '{input_line}' against '{pattern}'"
+    )  # Debugging statement to trace the matching process
+
     # If both input and pattern are empty, they match
     if len(input_line) == 0 and len(pattern) == 0:
+        print("Both input and pattern are empty, returning True")  # Debugging statement
         return True
-    # If pattern is empty, it matches any remaining input
+
+    # If pattern is empty but input is not, they match
     if not pattern:
+        print("Pattern is empty, returning True")  # Debugging statement
         return True
-    # If input is empty but pattern is not, they don't match
+
+    # If input is empty but pattern is not, they do not match
     if not input_line:
+        print(
+            "Input is empty but pattern is not, returning False"
+        )  # Debugging statement
         return False
 
-    # Check for start of string anchor '^'
+    # Handle grouped patterns
+    if pattern.startswith("("):
+        print("Found opening parenthesis")  # Debugging statement
+        closing_index = find_closing_parenthesis(
+            pattern
+        )  # Find the closing parenthesis
+        if closing_index == -1:
+            print(
+                "No matching closing parenthesis found, returning False"
+            )  # Debugging statement
+            return False
+        group = pattern[1:closing_index]  # Extract the group
+        rest = pattern[closing_index + 1 :]  # Extract the rest of the pattern
+        if OR_OPERATOR in group:
+            print("OR operator found in group")  # Debugging statement
+            subpatterns = group.split(OR_OPERATOR)  # Split the group by OR operator
+            for subpattern in subpatterns:
+                if match_pattern(input_line, subpattern + rest):
+                    print(
+                        f"Matched subpattern '{subpattern}', returning True"
+                    )  # Debugging statement
+                    return True
+            print("No subpatterns matched, returning False")  # Debugging statement
+            return False
+        else:
+            return match_pattern(
+                input_line, group + rest
+            )  # Recursively match the group
+
+    # Handle start anchor
     if pattern[0] == ANCHOR_START:
-        # Ensure the input line starts with the rest of the pattern
+        print("Found start anchor")  # Debugging statement
         return (
             match_pattern(input_line, pattern[1:])
             if input_line.startswith(pattern[1:])
             else False
-        )
+        )  # Check if input starts with the rest of the pattern
 
-    # Check for end of string anchor '$'
+    # Handle end anchor
     if pattern[-1] == ANCHOR_END:
-        # Ensure the input line ends with the pattern before the '$'
+        print("Found end anchor")  # Debugging statement
         return (
             match_pattern(input_line, pattern[:-1])
             and len(input_line) == len(pattern) - 1
-        )
+        )  # Check if input ends with the pattern
 
-    # Check for group start '('
-    if pattern[0] == GROUP_START:
-        # Find the matching group end ')'
-        group_end_index = find_matching_group_end(pattern)
-        if group_end_index == -1:
-            return False
-        # Try matching the pattern inside the group
-        if match_pattern(input_line, pattern[1:group_end_index]):
-            return match_pattern(input_line, pattern[group_end_index + 1 :])
-        else:
-            return False
-
-    # Check for alternation '|'
-    if ALTERNATION in pattern:
-        # Find the first occurrence of '|' to split the pattern
-        pipe_index = pattern.find(ALTERNATION)
-        # Try matching the pattern before the '|'
-        if match_pattern(input_line, pattern[:pipe_index]):
-            return True
-        # Try matching the pattern after the '|'
-        return match_pattern(input_line, pattern[pipe_index + 1 :])
-
-    # Check for one or more quantifier '+'
+    # Handle one or more quantifier
     if len(pattern) > 1 and pattern[1] == QUANTIFIER_ONE_OR_MORE:
-        # Match one or more occurrences of the preceding element
+        print("Found one or more quantifier")  # Debugging statement
         i = 0
         while i < len(input_line) and (
             input_line[i] == pattern[0] or pattern[0] == WILDCARD
         ):
             i += 1
-        if i > 0:
-            return match_pattern(input_line[i:], pattern[2:])
-        else:
-            return False
+        return (
+            match_pattern(input_line[i:], pattern[2:]) if i > 0 else False
+        )  # Recursively match the rest of the input
 
-    # Check for zero or one quantifier '?'
+    # Handle zero or one quantifier
     if len(pattern) > 1 and pattern[1] == QUANTIFIER_ZERO_OR_ONE:
-        # Match zero or one occurrence of the preceding element
+        print("Found zero or one quantifier")  # Debugging statement
         if input_line and (input_line[0] == pattern[0] or pattern[0] == WILDCARD):
-            return match_pattern(input_line[1:], pattern[2:])
+            return match_pattern(
+                input_line[1:], pattern[2:]
+            )  # Recursively match the rest of the input
         else:
-            return match_pattern(input_line, pattern[2:])
+            return match_pattern(
+                input_line, pattern[2:]
+            )  # Recursively match the rest of the pattern
 
-    # Check for wildcard '.'
+    # Handle wildcard
     if pattern[0] == WILDCARD:
-        # Match any single character
-        if input_line:
-            return match_pattern(input_line[1:], pattern[1:])
-        else:
-            return False
+        print("Found wildcard")  # Debugging statement
+        return (
+            match_pattern(input_line[1:], pattern[1:]) if input_line else False
+        )  # Recursively match the rest of the input
 
-    # If the current characters match, continue matching the rest
+    # Handle character match
     if pattern[0] == input_line[0]:
-        return match_pattern(input_line[1:], pattern[1:])
+        print("Characters match, continuing")  # Debugging statement
+        return match_pattern(
+            input_line[1:], pattern[1:]
+        )  # Recursively match the rest of the input
 
-    # Handle digit pattern '\\d'
+    # Handle digit check
     elif pattern[:2] == DIGIT:
-        for i in range(len(input_line)):
-            if input_line[i].isdigit():
-                return match_pattern(input_line[i:], pattern[2:])
-        else:
-            return False
+        print("Checking for digit")  # Debugging statement
+        return (
+            match_pattern(input_line[1:], pattern[2:])
+            if input_line[0].isdigit()
+            else False
+        )  # Check if the character is a digit
 
-    # Handle alphanumeric pattern '\\w'
+    # Handle alphanumeric check
     elif pattern[:2] == ALNUM:
-        if input_line[0].isalnum():
-            return match_pattern(input_line[1:], pattern[2:])
+        print("Checking for alphanumeric")  # Debugging statement
+        return (
+            match_pattern(input_line[1:], pattern[2:])
+            if input_line[0].isalnum()
+            else False
+        )  # Check if the character is alphanumeric
+
+    # Handle character class
+    elif pattern[0] == "[" and "]" in pattern:
+        print("Found character class")  # Debugging statement
+        closing_index = pattern.index("]")  # Find the closing bracket
+        chars = pattern[1:closing_index]  # Extract the characters in the class
+        if chars.startswith("^"):
+            return (
+                match_pattern(input_line[1:], pattern[closing_index + 1 :])
+                if input_line[0] not in chars[1:]
+                else False
+            )  # Check if the character is not in the class
         else:
-            return False
+            return (
+                match_pattern(input_line[1:], pattern[closing_index + 1 :])
+                if input_line[0] in chars
+                else False
+            )  # Check if the character is in the class
 
-    # Handle character class pattern '[...]'
-    elif pattern[0] == "[" and pattern[-1] == "]":
-        if pattern[1] == ANCHOR_START:
-            chrs = list(pattern[2:-1])
-            for c in chrs:
-                if c in input_line:
-                    return False
-            return True
-        chrs = list(pattern[1:-1])
-        for c in chrs:
-            if c in input_line:
-                return True
-        return False
-
-    # If none of the above conditions match, skip a character in input
-    else:
-        return match_pattern(input_line[1:], pattern)
+    print("No match found, returning False")  # Debugging statement
+    return False
 
 
-def find_matching_group_end(pattern):
-    level = 1
-    for i in range(1, len(pattern)):
-        if pattern[i] == GROUP_START:
-            level += 1
-        elif pattern[i] == GROUP_END:
-            level -= 1
-            if level == 0:
-                return i
-    return -1
+def find_closing_parenthesis(pattern):
+    """
+    Finds the index of the closing parenthesis that matches the first opening parenthesis in the pattern.
+
+    :param pattern: The pattern string to search within.
+    :return: The index of the closing parenthesis or -1 if not found.
+    """
+    count = 0  # Counter to track nested parentheses
+    for i, char in enumerate(pattern):
+        if char == "(":
+            count += 1  # Increment for opening parenthesis
+        elif char == ")":
+            count -= 1  # Decrement for closing parenthesis
+            if count == 0:
+                return i  # Return the index if matching closing parenthesis is found
+    return -1  # Return -1 if no matching closing parenthesis is found
 
 
 def main():

@@ -32,7 +32,7 @@ The entry point for the `grep` implementation is in `app/main.py`.
 - Matching end of string/line anchor ` echo -n "dog" | ./rift.sh -E "dog$"`
 - Match one or more quantifier `echo -n "caats" | ./rift.sh -E "ca+ts"`
 - Match zero or one quantifier `echo -n "dogs" | ./rift.sh -E "dogs?"`
-- Matching wildcard ` echo -n "dog" | ./rift.sh -E "d.g"`
+- Matching wildcard `echo -n "dog" | ./rift.sh -E "d.g"`
 
 # Good Read
 
