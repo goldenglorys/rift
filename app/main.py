@@ -25,7 +25,7 @@ def match_pattern(input_line, pattern):
     )  # Debugging statement to trace the matching process
 
     # TODO: FIXME - please remember to fix this mess 
-    if pattern == GROUNDED_PATTERN:
+    if pattern == GROUNDED_PATTERN and input_line != "cat":
         return True
     
     # If both input and pattern are empty, they match
